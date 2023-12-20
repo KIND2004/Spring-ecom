@@ -1,8 +1,10 @@
 package com.xrontech.spring.ecom.service.serviceImpl;
 
-import com.xrontech.spring.ecom.dto.UserLogInRequestDTO;
-import com.xrontech.spring.ecom.dto.UserRegisterRequestDTO;
+import com.xrontech.spring.ecom.dto.UserUpdateProfileDTO;
+import com.xrontech.spring.ecom.model.AddressType;
 import com.xrontech.spring.ecom.model.User;
+import com.xrontech.spring.ecom.model.UserAddress;
+import com.xrontech.spring.ecom.repository.UserAddressRepository;
 import com.xrontech.spring.ecom.repository.UserRepository;
 import com.xrontech.spring.ecom.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -10,61 +12,74 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final UserAddressRepository userAddressRepository;
 
     @Override
-    public ResponseEntity<?> userSignUp(UserRegisterRequestDTO userRegisterRequestDTO) {
-        if (userRegisterRequestDTO.getFirstName().equals("")) {
+    public ResponseEntity<?> userUpdateProfile(UserUpdateProfileDTO userUpdateProfileDTO) {
+        if (userUpdateProfileDTO.getFirstName().equals("")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("First Name not Found");
-        } else if (userRegisterRequestDTO.getLastName().equals("")) {
+        } else if (userUpdateProfileDTO.getLastName().equals("")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Last Name not Found");
-        } else if (userRegisterRequestDTO.getEmail().equals("")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not Found");
-        } else if (!Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?^`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])*$").matcher(userRegisterRequestDTO.getEmail().toLowerCase()).matches()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Email Address");
-        } else if (userRegisterRequestDTO.getMobile().equals("")) {
+        } else if (userUpdateProfileDTO.getMobile().equals("")) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mobile not Found");
-        } else if (!Pattern.compile("^07[01245678][0-9]{7}$").matcher(userRegisterRequestDTO.getMobile()).matches()) {
+        } else if (!Pattern.compile("^07[01245678][0-9]{7}$").matcher(userUpdateProfileDTO.getMobile()).matches()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Mobile Number");
-        } else if (userRegisterRequestDTO.getPassword().equals("")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Password not Found");
-        }
-//        else if (!Pattern.compile("^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[\\\\*@_\\\\-\\\\#\\\\$\\\\%\\\\^&\\\\(\\\\)\\\\{\\\\}\\\\[\\\\]|])[8,20]$").matcher(userRegisterRequestDTO.getPassword()).matches()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Your password must be 8-20 characters long and contain at least one digit, lowercase letter, uppercase letter, and special character from *, @, _, -, #, !, $, %, ^, &, (, ), {, }, [, ], or |.");
-//        }
-        else if (userRepository.findByEmail(userRegisterRequestDTO.getEmail().toLowerCase()).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email Already Exist");
-        } else if (userRepository.findByMobile(userRegisterRequestDTO.getMobile()).isPresent()) {
+        } else if ((userRepository.findByMobile(userUpdateProfileDTO.getMobile()).isPresent()) && (!userRepository.findById(1L).get().getMobile().equals(userRepository.findByMobile(userUpdateProfileDTO.getMobile()).get().getMobile()))) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Mobile Already Exist");
+        } else if ((!userUpdateProfileDTO.getZipCode().equals("")) && (userUpdateProfileDTO.getZipCode().length() != 5)) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Zip Code");
         } else {
-            User user = new User();
-            user.setFirstName(userRegisterRequestDTO.getFirstName());
-            user.setLastName(userRegisterRequestDTO.getLastName());
-            user.setEmail(userRegisterRequestDTO.getEmail().toLowerCase());
-            user.setMobile(userRegisterRequestDTO.getMobile());
-            user.setPassword(userRegisterRequestDTO.getPassword());
+
+            User user = userRepository.findById(1L).get();
+            user.setFirstName(userUpdateProfileDTO.getFirstName());
+            user.setLastName(userUpdateProfileDTO.getLastName());
+            user.setMobile(userUpdateProfileDTO.getMobile());
 
             userRepository.save(user);
 
-            return ResponseEntity.status(HttpStatus.CREATED).body("User Registered Successfully!");
-        }
-    }
+            UserAddress userAddress;
 
-    @Override
-    public ResponseEntity<?> userLogIn(UserLogInRequestDTO userLogInRequestDTO) {
-        if (userLogInRequestDTO.getEmail().equals("")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Email not Found");
-        } else if (userLogInRequestDTO.getPassword().equals("")) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Password not Found");
-        } else if (userRepository.findByEmailAndPassword(userLogInRequestDTO.getEmail(), userLogInRequestDTO.getPassword()).isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Credentials");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body("User Logged Successfully!");
+            Optional<UserAddress> optionalUserAddress = userAddressRepository.findByUserId(1L);
+            if (optionalUserAddress.isEmpty()) {
+                userAddress = new UserAddress();
+                userAddress.setUserId(1L);
+                userAddress.setAddressNumber(userUpdateProfileDTO.getAddressNumber());
+                userAddress.setStreetName(userUpdateProfileDTO.getStreetName());
+                userAddress.setCity(userUpdateProfileDTO.getCity());
+                userAddress.setZipCode(userUpdateProfileDTO.getZipCode());
+                userAddress.setAddressType(AddressType.HOME);
+            } else {
+                if (userUpdateProfileDTO.getAddressNumber().equals("")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address Number not Found");
+                } else if (userUpdateProfileDTO.getStreetName().equals("")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Street Name not Found");
+                } else if (userUpdateProfileDTO.getCity().equals("")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("City not Found");
+                } else if (userUpdateProfileDTO.getZipCode().equals("")) {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Zip Code not Found");
+                } else if (userUpdateProfileDTO.getZipCode().length() != 5) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid Zip Code");
+                } else {
+                    userAddress = optionalUserAddress.get();
+                    userAddress.setUserId(1L);
+                    userAddress.setAddressNumber(userUpdateProfileDTO.getAddressNumber());
+                    userAddress.setStreetName(userUpdateProfileDTO.getStreetName());
+                    userAddress.setCity(userUpdateProfileDTO.getCity());
+                    userAddress.setZipCode(userUpdateProfileDTO.getZipCode());
+                    userAddress.setAddressType(AddressType.HOME);
+                }
+            }
+
+            userAddressRepository.save(userAddress);
+
+            return ResponseEntity.status(HttpStatus.OK).body("User Profile Updated Successfully!");
         }
     }
 }
