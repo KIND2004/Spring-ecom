@@ -1,8 +1,6 @@
-package com.xrontech.spring.ecom.controller;
+package com.xrontech.spring.ecom.domain.security;
 
-import com.xrontech.spring.ecom.dto.LogInRequestDTO;
-import com.xrontech.spring.ecom.dto.RegisterRequestDTO;
-import com.xrontech.spring.ecom.service.AuthService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,16 +11,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
-public class AuthController {
+public class AuthResource {
     private final AuthService authService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> userSignUp(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<?> userSignUp(@Valid @RequestBody RegisterRequestDTO registerRequestDTO) {
         return authService.userSignUp(registerRequestDTO);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> userLogIn(@RequestBody LogInRequestDTO logInRequestDTO){
+    public ResponseEntity<?> userLogIn(@Valid @RequestBody LogInRequestDTO logInRequestDTO) {
         return authService.userLogIn(logInRequestDTO);
     }
 }

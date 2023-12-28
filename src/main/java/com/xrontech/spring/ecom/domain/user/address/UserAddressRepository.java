@@ -1,6 +1,5 @@
-package com.xrontech.spring.ecom.repository;
+package com.xrontech.spring.ecom.domain.user.address;
 
-import com.xrontech.spring.ecom.model.UserAddress;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

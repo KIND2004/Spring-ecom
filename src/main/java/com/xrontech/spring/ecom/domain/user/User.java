@@ -1,15 +1,15 @@
-package com.xrontech.spring.ecom.model;
+package com.xrontech.spring.ecom.domain.user;
 
+import com.xrontech.spring.ecom.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User extends BaseEntity {

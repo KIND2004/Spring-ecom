@@ -1,4 +1,4 @@
-package com.xrontech.spring.ecom.model;
+package com.xrontech.spring.ecom.domain.user;
 
 public enum UserType {
     ADMIN, VENDOR, BUYER

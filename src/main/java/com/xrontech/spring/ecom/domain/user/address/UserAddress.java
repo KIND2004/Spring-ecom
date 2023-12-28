@@ -1,13 +1,14 @@
-package com.xrontech.spring.ecom.model;
+package com.xrontech.spring.ecom.domain.user.address;
 
+import com.xrontech.spring.ecom.domain.user.User;
+import com.xrontech.spring.ecom.model.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "address")
 public class UserAddress extends BaseEntity {
