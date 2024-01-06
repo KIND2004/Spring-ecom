@@ -55,28 +55,30 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<?> userUpdateProfileImage(MultipartFile file) throws IOException {
-
+    public ResponseEntity<?> userUpdateProfileImage(MultipartFile file) {
         if (file.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Upload Profile Image");
         } else {
-            String projectRoot = System.getProperty("user.dir");
+            try {
+                String projectRoot = System.getProperty("user.dir");
 
-            String originalFilename = file.getOriginalFilename();
-            String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
-            String newFileName = UUID.randomUUID() + fileExtension;
+                String originalFilename = file.getOriginalFilename();
+                String fileExtension = originalFilename.substring(originalFilename.lastIndexOf("."));
+                String newFileName = UUID.randomUUID() + fileExtension;
 
-            String imagePath = "/uploads/" + newFileName;
-            Path path = Paths.get(projectRoot + imagePath);
-            File saveFile = new File(String.valueOf(path));
-            file.transferTo(saveFile);
+                String imagePath = "/uploads/" + newFileName;
+                Path path = Paths.get(projectRoot + imagePath);
+                File saveFile = new File(String.valueOf(path));
+                file.transferTo(saveFile);
 
-            User user = userRepository.findById(1L).get();
-            user.setProfileImagePath(imagePath);
-            userRepository.save(user);
+                User user = userRepository.findById(1L).get();
+                user.setProfileImagePath(imagePath);
+                userRepository.save(user);
 
-            return ResponseEntity.status(HttpStatus.OK).body("Profile Image Updated Successfully!");
+                return ResponseEntity.status(HttpStatus.OK).body("Profile Image Updated Successfully!");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
-
     }
 }

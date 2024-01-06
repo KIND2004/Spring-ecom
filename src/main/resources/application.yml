@@ -1,5 +1,3 @@
-server:
-  port: 8080
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/spring-ecom-db
@@ -12,3 +10,17 @@ spring:
   threads:
     virtual:
       enabled: true
+  mail:
+    host: "sandbox.smtp.mailtrap.io"
+    port: 587
+    username: "eb3d98eb8166d1"
+    password: "c434d75778187a"
+    properties:
+      mail:
+        smtp:
+          starttls:
+            enable: true
+        ssl:
+          trust: "*"
+springdoc:
+  paths-to-match: /**

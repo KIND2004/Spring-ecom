@@ -10,6 +10,7 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "address")
 public class UserAddress extends BaseEntity {
     @Id

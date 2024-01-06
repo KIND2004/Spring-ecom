@@ -24,7 +24,7 @@ public class UserResource {
     }
 
     @PostMapping("/profile-image")
-    public ResponseEntity<?> userUpdateProfileImage(@RequestBody MultipartFile file) throws IOException {
+    public ResponseEntity<?> userUpdateProfileImage(@RequestBody MultipartFile file) {
         return userService.userUpdateProfileImage(file);
     }
 }

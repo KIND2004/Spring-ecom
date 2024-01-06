@@ -2,17 +2,20 @@ package com.xrontech.spring.ecom.domain.security;
 
 import com.xrontech.spring.ecom.domain.user.User;
 import com.xrontech.spring.ecom.domain.user.UserRepository;
+import com.xrontech.spring.ecom.mail.MailService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Random;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 @Service
 public class AuthService {
     private final UserRepository userRepository;
+    private final MailService mailService;
 
     public ResponseEntity<?> userSignUp(RegisterRequestDTO registerRequestDTO) {
         if (userRepository.findByEmail(registerRequestDTO.getEmail().toLowerCase()).isPresent()) {
@@ -26,6 +29,13 @@ public class AuthService {
             user.setEmail(registerRequestDTO.getEmail().toLowerCase());
             user.setMobile(registerRequestDTO.getMobile());
             user.setPassword(registerRequestDTO.getPassword());
+
+            Random random = new Random();
+            int code = 100000 + random.nextInt(900000);
+
+            user.setVerificationCode(String.valueOf(code));
+
+            mailService.sendMail(registerRequestDTO.getEmail().toLowerCase(), "Verification Email", code);
 
             userRepository.save(user);
 

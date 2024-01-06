@@ -11,6 +11,7 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "users")
 public class User extends BaseEntity {
     @Id
@@ -34,7 +35,7 @@ public class User extends BaseEntity {
     private Timestamp emailVerifiedAt;
     @Enumerated(value = EnumType.STRING)
     @Column(name = "user_type")
-    private UserType userType = UserType.BUYER;
+    private UserType userType = UserType.CUSTOMER;
     @Column(name = "profile_image_path", columnDefinition = "TEXT")
     private String profileImagePath;
     @Column(name = "status")
