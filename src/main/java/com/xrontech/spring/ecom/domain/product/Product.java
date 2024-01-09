@@ -1,6 +1,7 @@
 package com.xrontech.spring.ecom.domain.product;
 
 import com.xrontech.spring.ecom.domain.product.brand_has_category.BrandHasCategory;
+import com.xrontech.spring.ecom.domain.user.User;
 import com.xrontech.spring.ecom.model.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,9 +28,14 @@ public class Product extends BaseEntity {
     private Integer quantity;
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
+    @Column(name = "user_id")
+    private Long userId;
     @Column(name = "status")
     private Boolean status;
     @ManyToOne
     @JoinColumn(name = "brand_has_category_id", referencedColumnName = "id", insertable = false, updatable = false)
     private BrandHasCategory brandHasCategory;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private User user;
 }
